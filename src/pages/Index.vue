@@ -63,7 +63,6 @@
     </div>
 
   </q-page>
-
 </template>
 
 <script>
@@ -216,12 +215,7 @@ function sleep(ms = 1000) {
 
 /*
 todo :
- - fork me on github: https://forkmeon.github.io/
  - scrollbar in textarea
  */
 
 </script>
-
-<style scoped lang="scss">
-
-</style>
