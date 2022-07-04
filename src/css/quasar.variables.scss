@@ -1,0 +1,118 @@
+// Quasar SCSS (& Sass) Variables
+// --------------------------------------------------
+// To customize the look and feel of this app, you can override
+// the Sass/SCSS variables found in Quasar's source Sass/SCSS files.
+
+// Check documentation for full list of Quasar variables
+
+// Your own variables (that are declared here) and Quasar's own
+// ones will be available out of the box in your .vue/.scss/.sass files
+
+// It's highly recommended to change the default colors
+// to match your app's branding.
+// Tip: Use the "Theme Builder" on Quasar's documentation website.
+
+
+//$primary   : #1976D2;
+//$secondary : #26A69A;
+//$accent    : #9C27B0;
+//
+//$dark      : #1D1D1D;
+//
+//$positive  : #21BA45;
+//$negative  : #C10015;
+//$info      : #31CCEC;
+//$warning   : #F2C037;
+
+$primary: #d48313;
+$secondary: #9c4949;
+$accent: #d064e3;
+
+$dark: #1d1d1d;
+
+$positive: #60b372;
+$negative: #f06060;
+$info: #434d91;
+$warning: #c9a234;
+
+
+@use "sass:list";
+
+
+//https://www.sitepoint.com/sass-theming-neverending-story/
+//https://draculatheme.com/contribute
+//https://speakerdeck.com/csswizardry/4half-methods-for-theming-in-s-css?slide=51
+
+
+$primary-fg: null;
+$secondary-fg: null;
+
+$primary-bg: null;
+$secondary-bg: null;
+
+$accent-bg: null;
+$accent-fg: null;
+
+
+$theme-colors: [(
+        'Background':#282a36,
+        'Current':#44475a,
+        'Foreground':#f8f8f2,
+        'SecBG':#22242a ,
+        'SecFG':#fff,
+        'Cyan':#8be9fd,
+        'Green':#50fa7b,
+        'Orange':#ffb86c,
+        'Pink':#ff79c6,
+        'Purple':#bd93f9,
+        'Red':#ff5555,
+        'Yellow':#f1fa8
+),
+(
+        'Background':#e7e7e7,
+        'Current':#b6b6b6,
+        'Foreground':#232323,
+        'SecBG':#fff,
+        'SecFG':#000,
+        'Cyan':#8be9fd,
+        'Green':#50fa7b,
+        'Orange':#ffb86c,
+        'Pink':#ff79c6,
+        'Purple':#bd93f9,
+        'Red':#ff5555,
+        'Yellow':#f1fa8
+)];
+
+$theme-names: 'dark', 'light';
+
+$theme-range: 1, 2;
+
+@mixin themify {
+  // Iterate over the themes
+  @each $i in $theme-range {
+    $theme: list.nth($theme-colors, $i);
+    $theme-name: list.nth($theme-names, $i);
+    &.body--#{$theme-name},
+    .body--#{$theme-name} & {
+      $primary-fg: map-get($theme, 'Foreground') !global;
+      $secondary-fg: map-get($theme, 'SecFG') !global;
+
+      $primary-bg: map-get($theme, 'Background') !global;
+      $secondary-bg: map-get($theme, 'SecBG') !global;
+
+      $accent-bg: darken(map-get($theme, 'Purple'), 20%) !global;
+      $accent-fg: map-get($theme, 'Red') !global;
+      @content;
+
+      // Unset the theme variables with `!global`
+      $primary-fg: null !global;
+      $secondary-fg: null !global;
+
+      $primary-bg: null !global;
+      $secondary-bg: null !global;
+
+      $accent-bg: null !global;
+      $accent-fg: null !global;
+    }
+  }
+}

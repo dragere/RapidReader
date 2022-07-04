@@ -1,0 +1,40 @@
+// app global css in SCSS form
+
+@use "sass:list";
+
+@import "src/css/quasar.variables";
+
+
+$directions: ['l', 'left'], ['r','right'],['t','top'],['b','bottom'];
+
+@each $d in $directions{
+  $cls: list.nth($d,1);
+  $prp: list.nth($d,2);
+  .q-b#{$cls}{
+    border-#{$prp}: 1px solid;
+  }
+}
+
+#body{
+  min-height: 90vh;
+  max-height: 99.9vh;
+  overflow: hidden;
+  @include themify {
+    background-color: $primary-bg;
+  }
+}
+
+button,.btn{
+  min-height: 56px;
+  min-width: 56px;
+}
+
+
+::-webkit-scrollbar {
+  width: 0.8rem;
+}
+::-webkit-scrollbar-thumb {
+  @include themify {
+    background-color: $primary-fg;
+  }
+}
