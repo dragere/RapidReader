@@ -68,11 +68,11 @@
                     break;
                 case "ArrowDown":
                     if (evt.ctrlKey) {
-                        fontSize--;
+                        if (fontSize > 1) fontSize--;
                         if (dbg) console.log("Key: fs-");
                         break;
                     }
-                    wordRate -= 25;
+                    if (wordRate > 50) wordRate -= 25;
                     if (dbg) console.log("Key: wr-");
                     break;
                 case "ArrowLeft":
@@ -132,6 +132,7 @@
         const x = word.length;
         // return (this.string.length - 6) ** 3 / 200 + 1;
         // return 0.000103853 * x ** 5 - 0.00414626 * x ** 4 + 0.0626928 * x ** 3 - 0.426316 * x ** 2 + 1.332 * x - 0.606007;
+        if (x === 0) return 0;
         if (x < 2) return 1;
         if (x < 4) return 0.8;
         if (x > 20) return 2;
