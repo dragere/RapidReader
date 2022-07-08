@@ -1,6 +1,6 @@
 <template>
   <q-page class="">
-    <word-display ref="display" class="row" :word="currentWord" :wordRate="wordRate"/>
+    <word-display ref="display" class="row" :word="allWords[this.counter]" :wordRate="wordRate" :size="fontSize"/>
     <div class="row justify-center">
       <div class="column" style="width: 66%;">
         <div class="row justify-center q-mb-md">
@@ -12,7 +12,7 @@
               aria-label="play_arrow"
               @click="handleStartButtonClick"
             />
-            <q-btn-group>
+            <q-btn-group class="q-br">
               <q-btn
                 flat
                 icon="chevron_left"
@@ -24,6 +24,20 @@
                 icon="chevron_right"
                 aria-label="chevron_right"
                 @click="jumpWords(1)"
+              />
+            </q-btn-group>
+            <q-btn-group>
+              <q-btn
+                flat
+                icon="add"
+                aria-label="add"
+                @click="fontSize++"
+              />
+              <q-btn
+                flat
+                icon="remove"
+                aria-label="remove"
+                @click="fontSize--"
               />
             </q-btn-group>
           </q-btn-group>
@@ -46,7 +60,8 @@
           </q-item-section>
           <q-item-section class="col-auto">
             <span>
-              ca. {{ (allWords.length / wordRate * 60).toFixed() }} Sec
+<!--              ca. {{ (allWords.length / wordRate * 60).toFixed() }} Sec-->
+              {{ (allDelays.reduce((x, y) => x + y) / 1000).toFixed() }} Sec
             </span>
           </q-item-section>
         </q-item>
@@ -84,10 +99,12 @@ export default defineComponent({
   data() {
     return {
       allWords: [''],
+      allDelays: [0],
       counter: 0,
       play: false,
       expanded: false,
-      wordRate: 300
+      wordRate: 300,
+      fontSize: 26
     }
   },
   mounted() {
@@ -121,9 +138,12 @@ export default defineComponent({
       }
     })
   },
-  computed: {
-    currentWord() {
-      return this.allWords[this.counter]
+  watch: {
+    // currentWord() {
+    //   return this.allWords[this.counter]
+    // }
+    wordRate() {
+      this.updateDelays()
     }
   },
   methods: {
@@ -138,7 +158,8 @@ export default defineComponent({
       while (this.play) {
         this.counter = (this.counter + 1) % this.allWords.length
         if (this.counter === 0) this.play = false
-        await sleep(this.getDelay(this.allWords[this.counter]))
+        // await sleep(this.getDelay(this.allWords[this.counter]))
+        await sleep(this.allDelays[this.counter])
       }
     },
 
@@ -154,7 +175,8 @@ export default defineComponent({
       for (let i = 0; i < 3; i++) {
         this.counter = (this.counter + mul) % this.allWords.length
         if (this.counter === 0) break
-        await sleep(this.getDelay(this.allWords[this.counter]) / 3)
+        // await sleep(this.getDelay(this.allWords[this.counter]) / 3)
+        await sleep(this.allDelays[this.counter] / 3)
       }
       if (oldPlay) {
         this.handleStartButtonClick()
@@ -164,30 +186,40 @@ export default defineComponent({
     updateText(txt) {
       // this.allWords = txt.split(/\s+/gm).flatMap(x => x.split(/-/gm).filter(y => y.length > 0))
       this.allWords = txt.split(/(?=\s\S)|(?<=[^-]-)/gm)//.map(x => x.trim()).filter(y => y.length > 0)
+      this.updateDelays()
       this.counter = 0
+    },
+    updateDelays() {
+      console.log("calc delays")
+      this.allDelays = this.allWords.map(w => this.getDelay(w))
     },
     /**
      *
      * @param word {string} word to calculate delay for
-     * @param numberMultiplier unused
-     * @param commaPenalty unused
-     * @param semicolonPenalty unused
-     * @param periodPenalty unused
+     * @param numberPenalty unused
+     * @param commaPenalty added multiplier when word ends with a comma (,)
+     * @param semicolonPenalty added multiplier when word ends with a semicolon (;)
+     * @param periodPenalty added multiplier when word ends with a period (.)
+     * @param colonPenalty added multiplier when word ends with a colon (:)
      * @return {number} delay in ms
      */
-    getDelay(word, numberMultiplier = 2, commaPenalty = 25, semicolonPenalty = 40, periodPenalty = 100) {
+    getDelay(word, numberPenalty = 2, commaPenalty = .3 , semicolonPenalty = .5, periodPenalty = .7, colonPenalty = .7) {
 
-      // const displayString = this.word.trim()
-      // const comma = displayString.endsWith(',')
-      // const semicolon = displayString.endsWith(';')
-      // const period = displayString.endsWith('.')
+      const displayString = word.trim()
+      const comma = displayString.endsWith(',')
+      const semicolon = displayString.endsWith(';')
+      const period = displayString.endsWith('.')
+      const colon = displayString.endsWith(':')
       // const special = displayString.match(/^[A-ZÄÖÜ]?[a-zäüö]+[.,;:]?$/) === null
 
       const defaultDelay = 60 / this.wordRate * 1000;
-      // const penalty = (comma ? commaPenalty : 0) + (semicolon ? semicolonPenalty : 0) + (period ? periodPenalty : 0);
-      // const mulNum = displayString.match(/^.*\d+.*$/) ? numberMultiplier : 1
+      const penalty = (comma ? commaPenalty * defaultDelay : 0) +
+        (semicolon ? semicolonPenalty * defaultDelay : 0) +
+        (period ? periodPenalty * defaultDelay : 0) +
+        (colon ? colonPenalty * defaultDelay : 0);
+      // const mulNum = displayString.match(/^.*\d+.*$/) ? numberPenalty : 1
       // return defaultDelay * mulNum * this.normalizedLenght() + penalty
-      return defaultDelay * this.normalizedLenght(word)
+      return defaultDelay * this.normalizedLenght(word) + penalty
     },
     /**
      * multiplier for how long this word should be shown
@@ -216,6 +248,9 @@ function sleep(ms = 1000) {
 /*
 todo :
  - scrollbar in textarea
+ - variable font size (ctrl + up/down arrow)
+ - stop highlighting on edit
+ - multiple words at once https://github.com/LumingYin/SpeedReader / https://www.spreeder.com/app.php?intro=1
  */
 
 </script>

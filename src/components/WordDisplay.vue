@@ -1,7 +1,7 @@
 <template>
   <div id="container">
-    <div id="word">
-      <span v-for="i in 3" :key="i" :id="'span_'+i">{{ splitWord[i-1] }}</span>
+    <div id="word" :style="'font-size: ' + size + 'px'">
+      <span v-for="i in 3" :key="i" :id="'span_'+i">{{ splitWord[i - 1] }}</span>
     </div>
   </div>
 </template>
@@ -17,6 +17,10 @@ export default defineComponent({
       required: true
     },
     wordRate: {
+      type: Number,
+      required: true
+    },
+    size: {
       type: Number,
       required: true
     }
@@ -62,15 +66,14 @@ export default defineComponent({
   padding: 1rem 0 1.2rem;
   font-size: 1em;
   margin: 10rem auto;
-  @include themify{
+  @include themify {
     background: linear-gradient(
-        90deg
-      , $primary-bg 0%, $secondary-bg 10%, $secondary-bg 90%, $primary-bg 100%);
+        90deg, $primary-bg 0%, $secondary-bg 10%, $secondary-bg 90%, $primary-bg 100%);
   }
 }
 
 #word {
-  font-size: 1.6em;
+  //font-size: 1.6em;
   line-height: 1.6em;
   height: 1.7em;
   font-weight: 600;

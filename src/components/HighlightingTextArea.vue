@@ -1,8 +1,9 @@
 <template>
   <div class="container">
     <div class="wordContainer fit">
-      <div :hidden="!highlight" class="backdrop box" ref="backdrop">
+      <div :hidden="!highlight" class="backdrop box" ref="backdrop" @scroll="onBackdropScroll">
         <mark class="highlights" v-if="highlightText !== ''">{{ highlightText }}</mark>
+        <span ref="anchor" style="width: 0; height: 0"></span>
         {{ noHighlightText }}
       </div>
       <textarea
@@ -11,7 +12,7 @@
         v-model="text"
         ref="textarea"
         @focus="e => e.target.select()"
-        @scroll="onScroll"
+        @scroll="onTextScroll"
         @change="newText">
       </textarea>
       <q-icon name="close" @click="clearText()" class="cursor-pointer"/>
@@ -33,7 +34,7 @@ export default {
       type: Boolean,
       required: true
     },
-    splitText:{
+    splitText: {
       type: Array,
       required: true
     }
@@ -59,9 +60,20 @@ export default {
       return this.splitText.slice(this.currentWord, this.splitText.length - 1).reduce((x, y) => x + y)
     }
   },
+  watch:{
+    highlight(newV){
+      if(newV === true){
+        this.$refs.anchor.scrollIntoView({behavior: "smooth"})
+        this.$refs.anchor.scroll
+        console.log('scrollIntoView')
+      }
+    }
+  },
   data() {
     return {
       text: '',
+      textScrolled: false,
+      currentTimeout: undefined
     }
   },
   methods: {
@@ -75,9 +87,19 @@ export default {
     setText(t) {
       this.text = t
     },
-    async onScroll() {
+    async onTextScroll() {
+      console.log('TextScroll')
+      clearTimeout(this.currentTimeout)
+      this.textScrolled = true
       this.$refs.backdrop.scrollTop = this.$refs.textarea.scrollTop;
       this.$refs.backdrop.scrollLeft = this.$refs.textarea.scrollLeft;
+      this.currentTimeout = setTimeout(() => this.textScrolled = false, 50)
+    },
+    async onBackdropScroll() {
+      console.log('BackdropScroll')
+      if (this.textScrolled) return
+      this.$refs.textarea.scrollTop = this.$refs.backdrop.scrollTop;
+      this.$refs.textarea.scrollLeft = this.$refs.backdrop.scrollLeft;
     }
   }
 }

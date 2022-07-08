@@ -3,6 +3,8 @@
 
 Inspired by http://www.sprintreader.com/
 
+For reading articles on page try https://github.com/cameron/squirt
+
 A Quasar Framework app.
 
 ## Install the dependencies
