@@ -108,7 +108,7 @@
             on:scroll={onTextScroll}
             on:change={newText}
         />
-        <q-icon name="close" on:click={clearText} class="cursor-pointer" />
+<!--        <q-icon name="close" on:click={clearText} class="cursor-pointer" />-->
     </div>
 </div>
 
